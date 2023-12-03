@@ -7,10 +7,24 @@ struct BallConfiguration {
     blue: i32,
 }
 
+impl BallConfiguration {
+    fn new(red: i32, green: i32, blue: i32) -> BallConfiguration {
+        BallConfiguration {red, green, blue}
+    }
+
+    fn total(&self) -> i32 {
+        self.red + self.green + self.blue
+    }
+
+    fn power(&self) -> i32 {
+        self.red * self.green * self.blue
+    }
+}
+
 
 pub fn main () {
     let cube_lines: String = download::get_input("https://adventofcode.com/2023/day/2/input").expect("Failed to get input");
-    let mut ball_min = BallConfiguration {red: 0, green: 0, blue: 0};  // initialize to 0
+    let mut ball_min = BallConfiguration::new(0, 0, 0);  // initialize to 0
     let mut draw_power: i32;
     let mut min_power_total = 0;
     for line in cube_lines.lines() {
@@ -42,9 +56,8 @@ pub fn main () {
             println!("mins r{} g{} b{}", ball_min.red, ball_min.green, ball_min.blue);
         }
         // calculate min power (product of each min value)
-        draw_power = ball_min.red * ball_min.green * ball_min.blue;
-        println!("draw power {}", draw_power);
-        min_power_total += draw_power;
+        println!("draw power {}", ball_min.power());
+        min_power_total += ball_min.power();
     }
     println!("{}", min_power_total);
 }
