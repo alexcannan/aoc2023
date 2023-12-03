@@ -9,27 +9,20 @@ struct BallConfiguration {
 
 
 pub fn main () {
-    let cube_lines = download::get_input("https://adventofcode.com/2023/day/2/input").expect("Failed to get input");
-    // expect 12 red, 13 green, and 14 blue balls
-    let ball_config: BallConfiguration = BallConfiguration {red: 12, green: 13, blue: 14};
-    let mut ball_draw = BallConfiguration {red: 0, green: 0, blue: 0};  // initialize to 0
+    let cube_lines: String = download::get_input("https://adventofcode.com/2023/day/2/input").expect("Failed to get input");
     let mut ball_min = BallConfiguration {red: 0, green: 0, blue: 0};  // initialize to 0
-    let mut good_draw;
-    let mut id_total: i32 = 0;
+    let mut draw_power: i32;
+    let mut min_power_total = 0;
     for line in cube_lines.lines() {
-        // println!("{}", line);
-        good_draw = true;
+        println!("{}", line);
         // lines are like Game 65: 7 red, 7 blue; 3 blue, 1 red, 1 green; 3 red, 8 blue
         // parse game id and draws separated by semicolons
         let game_id_and_draws: Vec<&str> = line.split(":").collect();
-        let game_id: i32 = game_id_and_draws[0].split_whitespace().collect::<Vec<&str>>()[1].parse::<i32>().expect("Failed to parse game id");
         let draws: Vec<&str> = game_id_and_draws[1].split(";").collect();
+        // reset min count
+        ball_min.red = 0; ball_min.green = 0; ball_min.blue = 0;
         // parse draws
         for draw in draws {
-            // reset draw count
-            ball_draw.red = 0; ball_draw.green = 0; ball_draw.blue = 0;
-            // reset min count
-            ball_min.red = 0; ball_min.green = 0; ball_min.blue = 0;
             // println!("{}", draw);
             let balls: Vec<&str> = draw.split(',').collect();
             for ball in balls {
@@ -37,26 +30,21 @@ pub fn main () {
                 let ball_color_and_count: Vec<&str> = ball.split_whitespace().collect();
                 let ball_color: &str = ball_color_and_count[1];
                 let ball_count: i32 = ball_color_and_count[0].parse::<i32>().expect("Failed to parse ball count");
-                // fill draw counts
+                // fill min counts
                 match ball_color {
-                    "red" => ball_draw.red += ball_count,
-                    "green" => ball_draw.green += ball_count,
-                    "blue" => ball_draw.blue += ball_count,
+                    "red" => if ball_min.red < ball_count {ball_min.red = ball_count},
+                    "green" => if ball_min.green < ball_count {ball_min.green = ball_count},
+                    "blue" => if ball_min.blue < ball_count {ball_min.blue = ball_count},
                     _ => panic!("Unknown ball color"),
                 }
             }
-            // check that draw does not exceed ball configuration
-            if ball_draw.red > ball_config.red || ball_draw.green > ball_config.green || ball_draw.blue > ball_config.blue {
-                good_draw = false;
-                break;
-            } else {
-                continue;
-            }
+            // print ball min
+            println!("mins r{} g{} b{}", ball_min.red, ball_min.green, ball_min.blue);
         }
-        // if draw is good, add game id to total
-        if good_draw {
-            id_total += game_id;
-        }
+        // calculate min power (product of each min value)
+        draw_power = ball_min.red * ball_min.green * ball_min.blue;
+        println!("draw power {}", draw_power);
+        min_power_total += draw_power;
     }
-    println!("{}", id_total)
+    println!("{}", min_power_total);
 }
