@@ -1,5 +1,3 @@
-use std::collections::BTreeSet;
-
 use crate::download;
 
 
@@ -11,14 +9,12 @@ struct Submap {
 
 
 struct Map {
-    source: String,
-    destination: String,
     mappings: Vec<Submap>,
 }
 
 impl Map {
-    fn new(source: String, destination: String) -> Map {
-        Map { source, destination, mappings: Vec::new() }
+    fn new() -> Map {
+        Map { mappings: Vec::new() }
     }
 
     fn add(&mut self, destination_range_start: u64, source_range_start: u64, range_length: u64) {
@@ -61,16 +57,10 @@ pub fn main() {
                 ranges.push(range);
             }
         } else if chunk.contains("map:") {
-            // parse `source-to-destination map:` for source and destination strings
-            // split lines, first line should be parsed for source destination, the rest should be iterated over
             let mut lines = chunk.lines();
-            let first_line = lines.next().unwrap();
-            let mut split_first_line = first_line.split_whitespace().nth(0).unwrap().split("-");
-            let source = split_first_line.next().unwrap().to_string();
-            // skip "to"
-            split_first_line.next();
-            let destination = split_first_line.next().unwrap().to_string();
-            maps.push(Map::new(source, destination));
+            let _first_line = lines.next().unwrap();
+            // if maps were not in order, we can unravel them with this line. but, they seem ordered.
+            maps.push(Map::new());
             // add submaps
             for line in lines {
                 let mut split_line = line.split_whitespace();
@@ -81,7 +71,7 @@ pub fn main() {
             }
         }
     }
-    let mut values: Vec<u64> = Vec::new();
+    let mut min_value: u64 = u64::MAX;
     let mut value: u64;
     let mut counter: u64 = 0;
     println!("total range {} million", ranges.iter().sum::<u64>() / 1000000);
@@ -95,9 +85,11 @@ pub fn main() {
             for map in &maps {
                 value = map.map(value);
             }
-            values.push(value);
+            if value < min_value {
+                min_value = value;
+            }
             // println!("{} -> {}", seed, value);
         }
     }
-    println!("lowest value: {}", values.iter().min().unwrap());
+    println!("lowest value: {}", min_value);
 }
