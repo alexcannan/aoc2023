@@ -3,25 +3,32 @@ use crate::download;
 
 pub fn main() {
     let input = download::get_input("https://adventofcode.com/2023/day/6/input").expect("Failed to download input");
-    let mut times: Vec<u32> = Vec::new();
-    let mut distances: Vec<u32> = Vec::new();
+    let mut times: Vec<u64> = Vec::new();
+    let mut distances: Vec<u64> = Vec::new();
     let mut lines = input.lines();
-    let mut potential_wins: Vec<u32> = Vec::new();
+    let mut potential_wins: Vec<u64> = Vec::new();
     while let Some(line) = lines.next() {
         let mut split_line = line.split_whitespace();
         // skip "Time:" or "Distance:"
         split_line.next();
-        while let Some(time) = split_line.next() {
-            let time: u32 = time.parse().unwrap();
-            times.push(time);
+        // join rest of digits into one number
+        let mut number = String::new();
+        while let Some(digit) = split_line.next() {
+            number.push_str(digit);
         }
+        let number: u64 = number.parse().unwrap();
+        times.push(number);
         let line = lines.next().unwrap();
         let mut split_line = line.split_whitespace();
+        // skip "Distance:"
         split_line.next();
-        while let Some(distance) = split_line.next() {
-            let distance: u32 = distance.parse().unwrap();
-            distances.push(distance);
+        // join rest of digits into one number
+        let mut number = String::new();
+        while let Some(digit) = split_line.next() {
+            number.push_str(digit);
         }
+        let number: u64 = number.parse().unwrap();
+        distances.push(number);
     }
     println!("times: {:?}", times);
     println!("dists: {:?}", distances);
@@ -30,7 +37,7 @@ pub fn main() {
         target distance = y
         actual time = y
      */
-    let mut n_wins: u32;
+    let mut n_wins: u64;
     for (i, time) in times.iter().enumerate() {
         n_wins = 0;
         for charge_time in 1..*time {
@@ -45,5 +52,5 @@ pub fn main() {
         potential_wins.push(n_wins);
     }
     println!("potential wins: {:?}", potential_wins);
-    println!("power of potential wins: {}", potential_wins.iter().product::<u32>());
+    println!("power of potential wins: {}", potential_wins.iter().product::<u64>());
 }
