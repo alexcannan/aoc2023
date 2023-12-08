@@ -1,11 +1,11 @@
 use std::process;
 
-mod aoc7;
+mod aoc8;
 mod download;
 
 
 fn main() {
     println!("Hello, aoc world!");
-    aoc7::main();
+    aoc8::main();
     process::exit(0);
 }
